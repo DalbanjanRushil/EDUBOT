@@ -129,7 +129,7 @@ async def get_answer(query: str = Form(...)):
             </div>
             <h2>EduBot – Ask PDF-Based Questions</h2>
             <form action="/" method="post">
-                <input type="text" name="query" placeholder="e.g. What is a noun?" required />
+                <input type="text" name="query" placeholder="e.g. What is a constructor?" required />
                 <button type="submit">Ask</button>
             </form>
             <div id="answer"><strong>Answer:</strong><br>{answer}</div>
