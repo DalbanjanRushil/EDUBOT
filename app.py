@@ -13,8 +13,6 @@ text = bot_module.extract_text_from_pdf("data/CHAPTER 6.pdf")
 chunks = bot_module.split_text(text)
 vectorstore = bot_module.create_vector_store(chunks)
 
-# Serve static files (optional, for CSS, JS later)
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/", response_class=HTMLResponse)
 async def index():
