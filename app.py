@@ -29,7 +29,7 @@ async def index():
     <body>
         <h2>🤖 Ask a Question About the PDF</h2>
         <form action="/" method="post">
-            <input type="text" name="query" placeholder="e.g. What is a noun?" required />
+            <input type="text" name="query" placeholder="Ques Realted to  English Grammar PDF of Communication Skill " required />
             <button type="submit">Ask</button>
         </form>
         {answer}
