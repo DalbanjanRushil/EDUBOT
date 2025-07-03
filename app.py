@@ -1,41 +1,64 @@
 # app.py
 
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi import FastAPI, Form, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-import main as bot_module  # ✅ This imports your full bot code
+import main as bot_module
 
 app = FastAPI()
 
-# ✅ Load PDF and create vector store only once
+# Load PDF + create vectorstore once
 text = bot_module.extract_text_from_pdf("data/CHAPTER 6.pdf")
 chunks = bot_module.split_text(text)
 vectorstore = bot_module.create_vector_store(chunks)
 
-
-class Question(BaseModel):
-    query: str
-
+# Serve static files (optional, for CSS, JS later)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/", response_class=HTMLResponse)
 async def index():
     return """
-    <h2>🤖 Welcome to PDF Chat Bot</h2>
-    <p>Send a POST request to <code>/ask</code> with JSON:</p>
-    <pre>
-POST /ask
-{
-  "query": "What is noun?"
-}
-    </pre>
+    <html>
+    <head>
+        <title>EduBot PDF Chat 🤖</title>
+        <style>
+            body { font-family: sans-serif; max-width: 700px; margin: 40px auto; padding: 20px; }
+            input, button, textarea { width: 100%; padding: 10px; margin-top: 10px; }
+            #answer { white-space: pre-wrap; background: #f5f5f5; padding: 15px; margin-top: 10px; border-radius: 5px; }
+        </style>
+    </head>
+    <body>
+        <h2>🤖 Ask a Question About the PDF</h2>
+        <form action="/" method="post">
+            <input type="text" name="query" placeholder="e.g. What is a noun?" required />
+            <button type="submit">Ask</button>
+        </form>
+        {answer}
+    </body>
+    </html>
+    """.replace("{answer}", "")
+
+@app.post("/", response_class=HTMLResponse)
+async def get_answer(query: str = Form(...)):
+    answer = bot_module.ask_question(vectorstore, query)
+    return f"""
+    <html>
+    <head>
+        <title>EduBot PDF Chat 🤖</title>
+        <style>
+            body {{ font-family: sans-serif; max-width: 700px; margin: 40px auto; padding: 20px; }}
+            input, button, textarea {{ width: 100%; padding: 10px; margin-top: 10px; }}
+            #answer {{ white-space: pre-wrap; background: #f5f5f5; padding: 15px; margin-top: 10px; border-radius: 5px; }}
+        </style>
+    </head>
+    <body>
+        <h2>🤖 Ask a Question About the PDF</h2>
+        <form action="/" method="post">
+            <input type="text" name="query" placeholder="e.g. What is a noun?" required />
+            <button type="submit">Ask</button>
+        </form>
+        <div id="answer"><strong>Answer:</strong><br>{answer}</div>
+    </body>
+    </html>
     """
-
-
-@app.post("/ask")
-async def ask(q: Question):
-    try:
-        # ✅ Call your main.py function
-        answer = bot_module.ask_question(vectorstore, q.query)
-        return JSONResponse(content={"answer": answer})
-    except Exception as e:
-        return JSONResponse(content={"error": str(e)}, status_code=500)
