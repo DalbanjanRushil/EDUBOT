@@ -3,3 +3,13 @@ openai
 faiss-cpu
 PyPDF2
 python-dotenv
+
+fastapi
+uvicorn
+pydantic
+pdfplumber
+python-dotenv
+langchain
+langchain-cohere
+cohere
+faiss-cpu
