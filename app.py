@@ -6,6 +6,7 @@ app = FastAPI()
 
 # Load PDF and create vectorstore once
 text = bot_module.extract_text_from_pdf("data/CHAPTER 6.pdf")
+text = bot_module.extract_text_from_pdf("data/CHAPTER 6.pdf")
 chunks = bot_module.split_text(text)
 vectorstore = bot_module.create_vector_store(chunks)
 
